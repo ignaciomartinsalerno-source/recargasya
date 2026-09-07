@@ -1,229 +1,78 @@
 import { useState } from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CreditCard,
-  Flame,
-  Gift,
-  Lock,
-  ShieldCheck,
-  Smartphone,
-} from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, CreditCard, Flame, Gift, Loader2, Lock, Smartphone } from "lucide-react";
 
 import movistarLogo from "@/assets/logos/movistar.svg";
 import claroLogo from "@/assets/logos/claro.svg";
 import personalLogo from "@/assets/logos/personal.svg";
 import tuentiLogo from "@/assets/logos/tuenti.svg";
+import {
+  AMOUNTS,
+  OPERATOR_CATALOG,
+  WELCOME_BONUS,
+  formatMoney,
+  quote,
+  type Offer,
+  type PaymentMethodId,
+} from "@/lib/catalog";
+import { createCheckoutSession } from "@/lib/checkout.functions";
 
-export interface Offer {
-  load: number;
-  receive: number;
-  tag: string;
-}
+export type { Offer };
+export { formatMoney };
 
-export const OPERATORS: { name: string; logo: string; offers: Offer[] }[] = [
-  {
-    name: "Movistar",
-    logo: movistarLogo,
-    offers: [
-      { load: 2000, receive: 4000, tag: "¡Se duplica!" },
-      { load: 5000, receive: 12000, tag: "¡x2,4 de regalo!" },
-      { load: 10000, receive: 25000, tag: "¡Super promo!" },
-    ],
-  },
-  {
-    name: "Claro",
-    logo: claroLogo,
-    offers: [
-      { load: 1000, receive: 2000, tag: "¡Se duplica!" },
-      { load: 2000, receive: 5000, tag: "¡x2,5 de regalo!" },
-      { load: 5000, receive: 11000, tag: "¡Imperdible!" },
-    ],
-  },
-  {
-    name: "Personal",
-    logo: personalLogo,
-    offers: [
-      { load: 1000, receive: 2200, tag: "¡x2,2 de regalo!" },
-      { load: 2000, receive: 4000, tag: "¡Se duplica!" },
-      { load: 10000, receive: 22000, tag: "¡Mega promo!" },
-    ],
-  },
-  {
-    name: "Tuenti",
-    logo: tuentiLogo,
-    offers: [
-      { load: 500, receive: 1200, tag: "¡x2,4 de regalo!" },
-      { load: 1000, receive: 2500, tag: "¡x2,5 de regalo!" },
-      { load: 5000, receive: 10000, tag: "¡Se duplica!" },
-    ],
-  },
-];
+const LOGOS: Record<string, string> = {
+  Movistar: movistarLogo,
+  Claro: claroLogo,
+  Personal: personalLogo,
+  Tuenti: tuentiLogo,
+};
 
-const AMOUNTS = [500, 1000, 2000, 5000, 10000];
+export const OPERATORS = OPERATOR_CATALOG.map((op) => ({
+  ...op,
+  logo: LOGOS[op.name] ?? movistarLogo,
+}));
 
-const PAYMENT_METHODS = [
+const PAYMENT_METHODS: { id: PaymentMethodId; label: string; icon: typeof CreditCard }[] = [
   { id: "credit", label: "Tarjeta de crédito", icon: CreditCard },
   { id: "debit", label: "Tarjeta de débito", icon: CreditCard },
 ];
-
-export function formatMoney(value: number): string {
-  return "$" + value.toLocaleString("es-AR");
-}
-
-function formatCardNumber(value: string): string {
-  return value
-    .replace(/\D/g, "")
-    .slice(0, 16)
-    .replace(/(\d{4})(?=\d)/g, "$1 ");
-}
-
-function formatExpiry(value: string): string {
-  const digits = value.replace(/\D/g, "").slice(0, 4);
-  if (digits.length <= 2) return digits;
-  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-}
 
 export function RechargeCard() {
   const [operator, setOperator] = useState("Movistar");
   const [amount, setAmount] = useState(1000);
   const [phone, setPhone] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"credit" | "debit" | null>(null);
-  const [step, setStep] = useState<"form" | "checkout">("form");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [holder, setHolder] = useState("");
-  const [docId, setDocId] = useState("");
-  const [paid, setPaid] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const startCheckout = useServerFn(createCheckoutSession);
 
   const current = OPERATORS.find((op) => op.name === operator) ?? OPERATORS[0]!;
   const activeOffer = current.offers.find((offer) => offer.load === amount);
-  const bonus = (activeOffer ? activeOffer.receive - activeOffer.load : 0) + 5000;
-  const totalCredit = formatMoney(amount + bonus);
+  const priced = quote(current.name, amount);
+  const totalCredit = formatMoney(priced?.credit ?? amount + WELCOME_BONUS);
 
-  const checkoutReady =
-    cardNumber.replace(/\s/g, "").length >= 15 &&
-    expiry.length === 5 &&
-    cvv.length >= 3 &&
-    holder.trim().length > 2;
+  const digits = phone.replace(/\D/g, "");
+  const canPay = Boolean(paymentMethod) && digits.length >= 8 && digits.length <= 13;
 
-  if (step === "checkout") {
-    return (
-      <div className="rounded-2xl bg-card p-6 shadow-2xl">
-        <button
-          onClick={() => {
-            setStep("form");
-            setPaid(false);
-          }}
-          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-card-foreground"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver
-        </button>
-
-        <h2 className="mt-3 text-xl font-bold text-card-foreground">Datos de tu tarjeta</h2>
-        <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Lock className="h-3.5 w-3.5" /> Conexión segura · Simulación, no se procesan pagos reales
-        </p>
-
-        <div className="mt-4 rounded-xl border border-border bg-surface-tint p-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2 text-card-foreground">
-              <img src={current.logo} alt={`Logo de ${current.name}`} className="max-h-4 max-w-14 object-contain" />
-              Recarga {current.name}
-            </span>
-            <span className="font-bold text-card-foreground">{formatMoney(amount)}</span>
-          </div>
-          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-            <span>{phone || "Sin número"}</span>
-            <span className="font-semibold text-success">Recibís {totalCredit}</span>
-          </div>
-        </div>
-
-        <div className="mt-5 space-y-3">
-          <div>
-            <label className="text-xs font-semibold text-card-foreground">Número de tarjeta</label>
-            <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-border px-3 py-3">
-              <CreditCard className="h-4 w-4 shrink-0 text-muted-foreground" />
-              <input
-                value={cardNumber}
-                onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                inputMode="numeric"
-                autoComplete="cc-number"
-                placeholder="1234 5678 9012 3456"
-                className="w-full bg-transparent text-sm tracking-wider text-card-foreground outline-none placeholder:text-muted-foreground"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-card-foreground">Vencimiento</label>
-              <input
-                value={expiry}
-                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                inputMode="numeric"
-                autoComplete="cc-exp"
-                placeholder="MM/AA"
-                className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-card-foreground">CVV</label>
-              <input
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                inputMode="numeric"
-                type="password"
-                autoComplete="cc-csc"
-                placeholder="123"
-                className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-card-foreground">Nombre del titular</label>
-            <input
-              value={holder}
-              onChange={(e) => setHolder(e.target.value)}
-              autoComplete="cc-name"
-              placeholder="Como figura en la tarjeta"
-              className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-card-foreground">DNI / CUIT del titular</label>
-            <input
-              value={docId}
-              onChange={(e) => setDocId(e.target.value.replace(/[^\d-]/g, "").slice(0, 13))}
-              inputMode="numeric"
-              placeholder="Ej: 30123456"
-              className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
-            />
-          </div>
-        </div>
-
-        <button
-          onClick={() => setPaid(true)}
-          disabled={!checkoutReady}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-bold text-brand-foreground transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Lock className="h-4 w-4" /> Pagar {formatMoney(amount)}
-        </button>
-
-        {paid ? (
-          <p className="mt-3 rounded-lg bg-success/10 px-3 py-2 text-center text-xs font-semibold text-success">
-            ¡Pago simulado aprobado! Tu recarga de {totalCredit} está en camino.
-          </p>
-        ) : (
-          <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
-            <ShieldCheck className="h-3.5 w-3.5" /> Simulación: no ingreses datos reales de tu tarjeta.
-          </p>
-        )}
-      </div>
-    );
+  async function handlePay() {
+    if (!paymentMethod || loading) return;
+    setError(null);
+    setLoading(true);
+    try {
+      const result = await startCheckout({
+        data: { operator: current.name, phone, amount, paymentMethod },
+      });
+      if (result?.url) {
+        window.location.href = result.url;
+        return;
+      }
+      setError("No pudimos abrir el pago. Probá de nuevo.");
+    } catch {
+      setError("No pudimos iniciar el pago. Revisá los datos e intentá otra vez.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -276,7 +125,7 @@ export function RechargeCard() {
         <Smartphone className="h-4 w-4 text-muted-foreground" />
         <input
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e) => setPhone(e.target.value.slice(0, 20))}
           inputMode="tel"
           placeholder="Ej: 11 1234 5678"
           className="w-full bg-transparent text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
@@ -320,7 +169,7 @@ export function RechargeCard() {
         {PAYMENT_METHODS.map((method) => (
           <button
             key={method.id}
-            onClick={() => setPaymentMethod(method.id as "credit" | "debit")}
+            onClick={() => setPaymentMethod(method.id)}
             className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
               paymentMethod === method.id
                 ? "border-brand bg-brand/5"
@@ -341,7 +190,7 @@ export function RechargeCard() {
           </div>
           <div className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between text-card-foreground">
-              <span>Recarga</span>
+              <span>Pagás</span>
               <span>{formatMoney(amount)}</span>
             </div>
             {activeOffer && (
@@ -352,7 +201,7 @@ export function RechargeCard() {
             )}
             <div className="flex justify-between font-semibold text-success">
               <span>Bono de bienvenida</span>
-              <span>+$5.000</span>
+              <span>+{formatMoney(WELCOME_BONUS)}</span>
             </div>
             <div className="mt-2 flex justify-between border-t border-success/20 pt-2 font-bold text-card-foreground">
               <span>Total a recibir</span>
@@ -363,12 +212,31 @@ export function RechargeCard() {
       )}
 
       <button
-        onClick={() => paymentMethod && setStep("checkout")}
-        disabled={!paymentMethod}
+        onClick={handlePay}
+        disabled={!canPay || loading}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-bold text-brand-foreground transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Continuar al pago <ArrowRight className="h-4 w-4" />
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" /> Abriendo el pago…
+          </>
+        ) : (
+          <>
+            Pagar {formatMoney(amount)} <ArrowRight className="h-4 w-4" />
+          </>
+        )}
       </button>
+
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
+        <Lock className="h-3.5 w-3.5" /> Pago seguro procesado por Stripe. No guardamos los datos de tu
+        tarjeta.
+      </p>
+
+      {error && (
+        <p className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-center text-xs font-semibold text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
