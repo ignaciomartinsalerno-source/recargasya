@@ -69,7 +69,7 @@ export function RechargeCard() {
   const [paymentMethod, setPaymentMethod] = useState<"credit" | "debit" | null>(null);
   const [notice, setNotice] = useState(false);
 
-  const current = OPERATORS.find((op) => op.name === operator) ?? OPERATORS[0];
+  const current = OPERATORS.find((op) => op.name === operator) ?? OPERATORS[0]!;
   const activeOffer = current.offers.find((offer) => offer.load === amount);
   const bonus = (activeOffer ? activeOffer.receive - activeOffer.load : 0) + 5000;
   const totalCredit = formatMoney(amount + bonus);
