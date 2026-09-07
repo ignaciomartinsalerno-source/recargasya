@@ -27,7 +27,10 @@ export function RechargeCard() {
   const [operator, setOperator] = useState("Movistar");
   const [amount, setAmount] = useState("$1.000");
   const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"credit" | "debit" | null>(null);
   const [notice, setNotice] = useState(false);
+
+  const totalCredit = formatMoney(parseAmount(amount) + 5000);
 
   return (
     <div className="rounded-2xl bg-card p-6 shadow-2xl">
