@@ -145,7 +145,7 @@ function Index() {
                   ))}
                 </ul>
                 <a
-                  href="#"
+                  href="#recargar"
                   className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand"
                 >
                   Recargar <ArrowRight className="h-4 w-4" />
@@ -159,7 +159,7 @@ function Index() {
       <WeeklyOffers />
 
       {/* Beneficios */}
-      <section className="bg-surface-tint">
+      <section className="bg-surface">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
           {BENEFITS.map(({ icon: Icon, title, text }) => (
             <div key={title} className="text-center">
