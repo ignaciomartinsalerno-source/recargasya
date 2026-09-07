@@ -197,6 +197,51 @@ export function RechargeCard() {
       </div>
 
       {paymentMethod && (
+        <div className="mt-5 rounded-xl border border-border p-4">
+          <p className="text-sm font-semibold text-card-foreground">Datos de tu tarjeta</p>
+          <div className="mt-3 space-y-3">
+            <input
+              value={cardNumber}
+              onChange={(e) => setCardNumber(formatCard(e.target.value))}
+              inputMode="numeric"
+              placeholder="Número de tarjeta"
+              className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                value={expiry}
+                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                inputMode="numeric"
+                placeholder="MM/AA"
+                className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+              />
+              <input
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                inputMode="numeric"
+                type="password"
+                placeholder="CVV"
+                className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+              />
+            </div>
+            <input
+              value={holder}
+              onChange={(e) => setHolder(e.target.value.slice(0, 40))}
+              placeholder="Nombre del titular"
+              className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+            />
+            <input
+              value={docId}
+              onChange={(e) => setDocId(e.target.value.slice(0, 15))}
+              inputMode="numeric"
+              placeholder="DNI / CUIT (opcional)"
+              className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+            />
+          </div>
+        </div>
+      )}
+
+      {paymentMethod && (
         <div className="mt-5 rounded-xl border border-success/30 bg-success/10 p-4">
           <div className="flex items-center gap-2 text-success">
             <Gift className="h-4 w-4" />
