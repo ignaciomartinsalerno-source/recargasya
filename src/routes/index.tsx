@@ -2,8 +2,10 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
+  CreditCard,
   Eye,
   Facebook,
+  Gift,
   Headphones,
   Instagram,
   Lock,
