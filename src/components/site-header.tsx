@@ -62,8 +62,8 @@ export function SiteFooter() {
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-navy-foreground/75">
           {NAV.map((item) => (
-            <a key={item} href="#" className="hover:text-navy-foreground">
-              {item}
+            <a key={item.label} href={item.href} className="hover:text-navy-foreground">
+              {item.label}
             </a>
           ))}
         </nav>
