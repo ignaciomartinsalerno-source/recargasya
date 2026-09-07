@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Smartphone } from "lucide-react";
+import { ArrowRight, CreditCard, Gift, Smartphone } from "lucide-react";
 
 export const OPERATORS = [
   { name: "Movistar", initials: "M", tone: "bg-brand text-brand-foreground" },
@@ -10,11 +10,27 @@ export const OPERATORS = [
 
 const AMOUNTS = ["$500", "$1.000", "$2.000", "$5.000", "$10.000"];
 
+const PAYMENT_METHODS = [
+  { id: "credit", label: "Tarjeta de crédito", icon: CreditCard },
+  { id: "debit", label: "Tarjeta de débito", icon: CreditCard },
+];
+
+function parseAmount(value: string): number {
+  return Number(value.replace(/\D/g, ""));
+}
+
+function formatMoney(value: number): string {
+  return "$" + value.toLocaleString("es-AR");
+}
+
 export function RechargeCard() {
   const [operator, setOperator] = useState("Movistar");
   const [amount, setAmount] = useState("$1.000");
   const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"credit" | "debit" | null>(null);
   const [notice, setNotice] = useState(false);
+
+  const totalCredit = formatMoney(parseAmount(amount) + 5000);
 
   return (
     <div className="rounded-2xl bg-card p-6 shadow-2xl">
@@ -70,6 +86,47 @@ export function RechargeCard() {
           </button>
         ))}
       </div>
+
+      <p className="mt-5 text-sm font-semibold text-card-foreground">4. Elegí cómo pagar</p>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        {PAYMENT_METHODS.map((method) => (
+          <button
+            key={method.id}
+            onClick={() => setPaymentMethod(method.id as "credit" | "debit")}
+            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
+              paymentMethod === method.id
+                ? "border-brand bg-brand/5"
+                : "border-border hover:border-brand/40"
+            }`}
+          >
+            <method.icon className="h-6 w-6 text-muted-foreground" />
+            <span className="text-[11px] font-medium text-muted-foreground">{method.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {paymentMethod && (
+        <div className="mt-5 rounded-xl border border-success/30 bg-success/10 p-4">
+          <div className="flex items-center gap-2 text-success">
+            <Gift className="h-4 w-4" />
+            <span className="text-xs font-bold uppercase tracking-wide">Promo primer abono</span>
+          </div>
+          <div className="mt-2 space-y-1 text-sm">
+            <div className="flex justify-between text-card-foreground">
+              <span>Recarga</span>
+              <span>{amount}</span>
+            </div>
+            <div className="flex justify-between font-semibold text-success">
+              <span>Bono de bienvenida</span>
+              <span>+$5.000</span>
+            </div>
+            <div className="mt-2 flex justify-between border-t border-success/20 pt-2 font-bold text-card-foreground">
+              <span>Total a recibir</span>
+              <span>{totalCredit}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <button
         onClick={() => setNotice(true)}

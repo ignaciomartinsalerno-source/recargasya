@@ -2,8 +2,10 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
+  CreditCard,
   Eye,
   Facebook,
+  Gift,
   Headphones,
   Instagram,
   Lock,
@@ -43,8 +45,8 @@ export const Route = createFileRoute("/")({
 
 const BENEFITS = [
   { icon: Zap, title: "Recarga inmediata", text: "Tu saldo se acredita en segundos." },
-  { icon: Lock, title: "Pagos seguros", text: "Tus datos están protegidos." },
-  { icon: Smartphone, title: "Desde cualquier dispositivo", text: "PC, tablet o celular." },
+  { icon: CreditCard, title: "Pagá con tarjeta", text: "Crédito o débito, de forma segura." },
+  { icon: Gift, title: "Bono de bienvenida", text: "$5000 en tu primer abono con tarjeta." },
   { icon: Headphones, title: "Soporte 24/7", text: "Estamos para ayudarte." },
 ];
 
@@ -57,7 +59,13 @@ function Index() {
 
       {/* Portada */}
       <section className="relative overflow-hidden bg-navy">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 lg:grid-cols-[1fr_420px_240px] lg:items-center lg:px-8 lg:py-20">
+        <div className="mx-auto max-w-7xl px-5 pt-6 lg:px-8">
+          <div className="mx-auto flex w-fit items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-sm font-semibold text-success">
+            <Gift className="h-4 w-4" />
+            Primera recarga con tarjeta: te regalamos $5000 de crédito de bono
+          </div>
+        </div>
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-10 lg:grid-cols-[1fr_420px_240px] lg:items-center lg:px-8 lg:py-14">
           <div>
             <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-navy-foreground sm:text-5xl lg:text-6xl">
               Recargá tu celular
