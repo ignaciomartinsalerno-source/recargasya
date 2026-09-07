@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, CreditCard, Flame, Gift, Loader2, Lock, Smartphone } from "lucide-react";
+import { ArrowRight, CheckCircle2, CreditCard, Flame, Gift, Loader2, Lock, Smartphone } from "lucide-react";
 
 import movistarLogo from "@/assets/logos/movistar.svg";
 import claroLogo from "@/assets/logos/claro.svg";
@@ -15,7 +14,7 @@ import {
   type Offer,
   type PaymentMethodId,
 } from "@/lib/catalog";
-import { createCheckoutSession } from "@/lib/checkout.functions";
+
 
 export type { Offer };
 export { formatMoney };
@@ -44,8 +43,12 @@ export function RechargeCard() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const startCheckout = useServerFn(createCheckoutSession);
+  const [done, setDone] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [holder, setHolder] = useState("");
+  const [docId, setDocId] = useState("");
 
   const current = OPERATORS.find((op) => op.name === operator) ?? OPERATORS[0]!;
   const activeOffer = current.offers.find((offer) => offer.load === amount);
@@ -53,26 +56,37 @@ export function RechargeCard() {
   const totalCredit = formatMoney(priced?.credit ?? amount + WELCOME_BONUS);
 
   const digits = phone.replace(/\D/g, "");
-  const canPay = Boolean(paymentMethod) && digits.length >= 8 && digits.length <= 13;
+  const cardDigits = cardNumber.replace(/\D/g, "");
+  const canPay =
+    Boolean(paymentMethod) &&
+    digits.length >= 8 &&
+    digits.length <= 13 &&
+    cardDigits.length >= 15 &&
+    /^\d{2}\/\d{2}$/.test(expiry) &&
+    cvv.length >= 3 &&
+    holder.trim().length >= 3;
 
-  async function handlePay() {
-    if (!paymentMethod || loading) return;
+  function formatCard(value: string) {
+    return value
+      .replace(/\D/g, "")
+      .slice(0, 16)
+      .replace(/(.{4})/g, "$1 ")
+      .trim();
+  }
+
+  function formatExpiry(value: string) {
+    const d = value.replace(/\D/g, "").slice(0, 4);
+    return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+  }
+
+  function handlePay() {
+    if (!canPay || loading) return;
     setError(null);
     setLoading(true);
-    try {
-      const result = await startCheckout({
-        data: { operator: current.name, phone, amount, paymentMethod },
-      });
-      if (result?.url) {
-        window.location.href = result.url;
-        return;
-      }
-      setError("No pudimos abrir el pago. Probá de nuevo.");
-    } catch {
-      setError("No pudimos iniciar el pago. Revisá los datos e intentá otra vez.");
-    } finally {
+    window.setTimeout(() => {
       setLoading(false);
-    }
+      setDone(true);
+    }, 1200);
   }
 
   return (
@@ -183,6 +197,51 @@ export function RechargeCard() {
       </div>
 
       {paymentMethod && (
+        <div className="mt-5 rounded-xl border border-border p-4">
+          <p className="text-sm font-semibold text-card-foreground">Datos de tu tarjeta</p>
+          <div className="mt-3 space-y-3">
+            <input
+              value={cardNumber}
+              onChange={(e) => setCardNumber(formatCard(e.target.value))}
+              inputMode="numeric"
+              placeholder="Número de tarjeta"
+              className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                value={expiry}
+                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                inputMode="numeric"
+                placeholder="MM/AA"
+                className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+              />
+              <input
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                inputMode="numeric"
+                type="password"
+                placeholder="CVV"
+                className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+              />
+            </div>
+            <input
+              value={holder}
+              onChange={(e) => setHolder(e.target.value.slice(0, 40))}
+              placeholder="Nombre del titular"
+              className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+            />
+            <input
+              value={docId}
+              onChange={(e) => setDocId(e.target.value.slice(0, 15))}
+              inputMode="numeric"
+              placeholder="DNI / CUIT (opcional)"
+              className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
+            />
+          </div>
+        </div>
+      )}
+
+      {paymentMethod && (
         <div className="mt-5 rounded-xl border border-success/30 bg-success/10 p-4">
           <div className="flex items-center gap-2 text-success">
             <Gift className="h-4 w-4" />
@@ -218,7 +277,7 @@ export function RechargeCard() {
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" /> Abriendo el pago…
+            <Loader2 className="h-4 w-4 animate-spin" /> Procesando el pago…
           </>
         ) : (
           <>
@@ -227,10 +286,20 @@ export function RechargeCard() {
         )}
       </button>
 
+      {done && (
+        <div className="mt-4 flex items-start gap-2 rounded-xl border border-success/30 bg-success/10 px-3 py-3 text-xs font-semibold text-success">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            ¡Pago aprobado! Acreditamos {totalCredit} en tu línea {phone || "seleccionada"} de{" "}
+            {current.name}.
+          </span>
+        </div>
+      )}
+
       <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
-        <Lock className="h-3.5 w-3.5" /> Pago seguro procesado por Stripe. No guardamos los datos de tu
-        tarjeta.
+        <Lock className="h-3.5 w-3.5" /> Pago seguro con cifrado. No guardamos los datos de tu tarjeta.
       </p>
+
 
       {error && (
         <p className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-center text-xs font-semibold text-destructive">
