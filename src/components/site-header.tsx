@@ -27,15 +27,15 @@ export function SiteHeader() {
         <nav className="order-3 -mx-1 flex w-full items-center gap-1 overflow-x-auto text-sm lg:order-2 lg:mx-6 lg:w-auto lg:flex-1">
           {NAV.map((item, i) => (
             <a
-              key={item}
-              href="#"
+              key={item.label}
+              href={item.href}
               className={`whitespace-nowrap rounded-md px-3 py-2 transition-colors ${
                 i === 0
                   ? "bg-white/10 font-semibold text-navy-foreground"
                   : "text-navy-foreground/70 hover:text-navy-foreground"
               }`}
             >
-              {item}
+              {item.label}
             </a>
           ))}
         </nav>
