@@ -14,7 +14,7 @@ import {
   type Offer,
   type PaymentMethodId,
 } from "@/lib/catalog";
-import { createCheckoutSession } from "@/lib/checkout.functions";
+
 
 export type { Offer };
 export { formatMoney };
