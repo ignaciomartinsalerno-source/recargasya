@@ -87,6 +87,47 @@ export function RechargeCard() {
         ))}
       </div>
 
+      <p className="mt-5 text-sm font-semibold text-card-foreground">4. Elegí cómo pagar</p>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        {PAYMENT_METHODS.map((method) => (
+          <button
+            key={method.id}
+            onClick={() => setPaymentMethod(method.id as "credit" | "debit")}
+            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
+              paymentMethod === method.id
+                ? "border-brand bg-brand/5"
+                : "border-border hover:border-brand/40"
+            }`}
+          >
+            <method.icon className="h-6 w-6 text-muted-foreground" />
+            <span className="text-[11px] font-medium text-muted-foreground">{method.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {paymentMethod && (
+        <div className="mt-5 rounded-xl border border-success/30 bg-success/10 p-4">
+          <div className="flex items-center gap-2 text-success">
+            <Gift className="h-4 w-4" />
+            <span className="text-xs font-bold uppercase tracking-wide">Promo primer abono</span>
+          </div>
+          <div className="mt-2 space-y-1 text-sm">
+            <div className="flex justify-between text-card-foreground">
+              <span>Recarga</span>
+              <span>{amount}</span>
+            </div>
+            <div className="flex justify-between font-semibold text-success">
+              <span>Bono de bienvenida</span>
+              <span>+$5.000</span>
+            </div>
+            <div className="mt-2 flex justify-between border-t border-success/20 pt-2 font-bold text-card-foreground">
+              <span>Total a recibir</span>
+              <span>{totalCredit}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <button
         onClick={() => setNotice(true)}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-bold text-brand-foreground transition-colors hover:bg-brand/90"
