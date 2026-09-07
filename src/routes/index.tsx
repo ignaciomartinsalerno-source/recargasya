@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 import { SiteFooter, SiteHeader } from "@/components/site-header";
+import { WeeklyOffers } from "@/components/weekly-offers";
+import { HowItWorks } from "@/components/how-it-works";
 import { formatMoney, OPERATORS, RechargeCard } from "@/components/recharge-card";
 import heroPhone from "@/assets/hero-phone.jpg";
 import successPhone from "@/assets/success-phone.jpg";
