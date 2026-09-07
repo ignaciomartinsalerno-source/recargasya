@@ -1,6 +1,12 @@
 import { Smartphone } from "lucide-react";
 
-const NAV = ["Inicio", "Recargas", "Planes", "Cómo funciona", "Contacto"];
+const NAV = [
+  { label: "Inicio", href: "#inicio" },
+  { label: "Recargas", href: "#recargar" },
+  { label: "Ofertas semanales", href: "#ofertas" },
+  { label: "Cómo funciona", href: "#como-funciona" },
+  { label: "Contacto", href: "#contacto" },
+];
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
