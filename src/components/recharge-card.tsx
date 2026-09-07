@@ -277,7 +277,7 @@ export function RechargeCard() {
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" /> Abriendo el pago…
+            <Loader2 className="h-4 w-4 animate-spin" /> Procesando el pago…
           </>
         ) : (
           <>
@@ -286,10 +286,20 @@ export function RechargeCard() {
         )}
       </button>
 
+      {done && (
+        <div className="mt-4 flex items-start gap-2 rounded-xl border border-success/30 bg-success/10 px-3 py-3 text-xs font-semibold text-success">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            ¡Pago aprobado! Acreditamos {totalCredit} en tu línea {phone || "seleccionada"} de{" "}
+            {current.name}.
+          </span>
+        </div>
+      )}
+
       <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
-        <Lock className="h-3.5 w-3.5" /> Pago seguro procesado por Stripe. No guardamos los datos de tu
-        tarjeta.
+        <Lock className="h-3.5 w-3.5" /> Pago seguro con cifrado. No guardamos los datos de tu tarjeta.
       </p>
+
 
       {error && (
         <p className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-center text-xs font-semibold text-destructive">
