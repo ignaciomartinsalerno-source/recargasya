@@ -25,13 +25,13 @@ import successPhone from "@/assets/success-phone.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "RecargaYa — Recargá tu celular en segundos" },
+      { title: "RecargasYa — Recargá tu celular en segundos" },
       {
         name: "description",
         content:
           "Recargá saldo y comprá packs de datos de Movistar, Claro, Personal y Tuenti en segundos. Simple, rápido y seguro.",
       },
-      { property: "og:title", content: "RecargaYa — Recargá tu celular en segundos" },
+      { property: "og:title", content: "RecargasYa — Recargá tu celular en segundos" },
       {
         property: "og:description",
         content:
