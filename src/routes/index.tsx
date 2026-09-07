@@ -59,7 +59,7 @@ function Index() {
       <SiteHeader />
 
       {/* Portada */}
-      <section className="relative overflow-hidden bg-navy">
+      <section id="inicio" className="relative overflow-hidden bg-navy">
         <div className="mx-auto max-w-7xl px-5 pt-6 lg:px-8">
           <div className="mx-auto flex w-fit items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-sm font-semibold text-success">
             <Gift className="h-4 w-4" />
