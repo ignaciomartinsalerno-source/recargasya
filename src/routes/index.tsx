@@ -171,8 +171,10 @@ function Index() {
         </div>
       </section>
 
+      <HowItWorks />
+
       {/* Bloque final */}
-      <section className="bg-surface">
+      <section id="contacto" className="scroll-mt-20 bg-surface">
         <div className="mx-auto grid max-w-7xl gap-6 px-5 py-14 lg:grid-cols-[1.4fr_1fr] lg:px-8">
           <div className="grid items-center gap-6 rounded-2xl bg-navy p-6 sm:grid-cols-2">
             <img
