@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Smartphone } from "lucide-react";
+import { ArrowRight, CreditCard, Gift, Smartphone } from "lucide-react";
 
 export const OPERATORS = [
   { name: "Movistar", initials: "M", tone: "bg-brand text-brand-foreground" },
