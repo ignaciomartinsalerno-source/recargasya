@@ -45,8 +45,8 @@ export const Route = createFileRoute("/")({
 
 const BENEFITS = [
   { icon: Zap, title: "Recarga inmediata", text: "Tu saldo se acredita en segundos." },
-  { icon: Lock, title: "Pagos seguros", text: "Tus datos están protegidos." },
-  { icon: Smartphone, title: "Desde cualquier dispositivo", text: "PC, tablet o celular." },
+  { icon: CreditCard, title: "Pagá con tarjeta", text: "Crédito o débito, de forma segura." },
+  { icon: Gift, title: "Bono de bienvenida", text: "$5000 en tu primer abono con tarjeta." },
   { icon: Headphones, title: "Soporte 24/7", text: "Estamos para ayudarte." },
 ];
 
