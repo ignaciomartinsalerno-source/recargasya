@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PagoCanceladoRouteImport } from './routes/pago-cancelado'
+import { Route as PagoExitosoRouteImport } from './routes/pago-exitoso'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PagoCanceladoRoute = PagoCanceladoRouteImport.update({
+  id: '/pago-cancelado',
+  path: '/pago-cancelado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagoExitosoRoute = PagoExitosoRouteImport.update({
+  id: '/pago-exitoso',
+  path: '/pago-exitoso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/pago-cancelado': typeof PagoCanceladoRoute
+  '/pago-exitoso': typeof PagoExitosoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/pago-cancelado': typeof PagoCanceladoRoute
+  '/pago-exitoso': typeof PagoExitosoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/pago-cancelado': typeof PagoCanceladoRoute
+  '/pago-exitoso': typeof PagoExitosoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/pago-cancelado' | '/pago-exitoso'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/pago-cancelado' | '/pago-exitoso'
+  id: '__root__' | '/' | '/pago-cancelado' | '/pago-exitoso'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PagoCanceladoRoute: typeof PagoCanceladoRoute
+  PagoExitosoRoute: typeof PagoExitosoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pago-cancelado': {
+      id: '/pago-cancelado'
+      path: '/pago-cancelado'
+      fullPath: '/pago-cancelado'
+      preLoaderRoute: typeof PagoCanceladoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pago-exitoso': {
+      id: '/pago-exitoso'
+      path: '/pago-exitoso'
+      fullPath: '/pago-exitoso'
+      preLoaderRoute: typeof PagoExitosoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PagoCanceladoRoute: PagoCanceladoRoute,
+  PagoExitosoRoute: PagoExitosoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
