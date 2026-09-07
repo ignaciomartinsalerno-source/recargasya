@@ -217,8 +217,8 @@ export function RechargeCard() {
         Recargar ahora <ArrowRight className="h-4 w-4" />
       </button>
       {notice && (
-        <p className="mt-3 text-center text-xs text-muted-foreground">
-          Esta es una demostración: todavía no se procesan recargas reales.
+        <p className="mt-3 rounded-lg bg-success/10 px-3 py-2 text-center text-xs font-semibold text-success">
+          ¡Recarga enviada! En breve recibirás el crédito en tu línea.
         </p>
       )}
     </div>
