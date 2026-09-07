@@ -5,6 +5,7 @@ import {
   CreditCard,
   Eye,
   Facebook,
+  Flame,
   Gift,
   Headphones,
   Instagram,
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 
 import { SiteFooter, SiteHeader } from "@/components/site-header";
-import { OPERATORS, RechargeCard } from "@/components/recharge-card";
+import { formatMoney, OPERATORS, RechargeCard } from "@/components/recharge-card";
 import heroPhone from "@/assets/hero-phone.jpg";
 import successPhone from "@/assets/success-phone.jpg";
 
@@ -121,7 +122,24 @@ function Index() {
                     className="max-h-10 max-w-[140px] object-contain"
                   />
                 </div>
-                <p className="mt-5 text-sm text-muted-foreground">Saldo, datos y packs</p>
+                <p className="mt-4 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand">
+                  <Flame className="h-3.5 w-3.5" /> Ofertas de la semana
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {op.offers.map((offer) => (
+                    <li
+                      key={offer.load}
+                      className="flex items-center justify-between rounded-lg bg-surface-tint px-3 py-2 text-xs"
+                    >
+                      <span className="font-semibold text-card-foreground">
+                        Cargás {formatMoney(offer.load)}
+                      </span>
+                      <span className="font-bold text-success">
+                        Recibís {formatMoney(offer.receive)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
                 <a
                   href="#"
                   className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand"
