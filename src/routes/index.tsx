@@ -154,6 +154,8 @@ function Index() {
         </div>
       </section>
 
+      <WeeklyOffers />
+
       {/* Beneficios */}
       <section className="bg-surface-tint">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
