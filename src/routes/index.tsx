@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 import { SiteFooter, SiteHeader } from "@/components/site-header";
+import { WeeklyOffers } from "@/components/weekly-offers";
+import { HowItWorks } from "@/components/how-it-works";
 import { formatMoney, OPERATORS, RechargeCard } from "@/components/recharge-card";
 import heroPhone from "@/assets/hero-phone.jpg";
 import successPhone from "@/assets/success-phone.jpg";
@@ -59,7 +61,7 @@ function Index() {
       <SiteHeader />
 
       {/* Portada */}
-      <section className="relative overflow-hidden bg-navy">
+      <section id="inicio" className="relative overflow-hidden bg-navy">
         <div className="mx-auto max-w-7xl px-5 pt-6 lg:px-8">
           <div className="mx-auto flex w-fit items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-sm font-semibold text-success">
             <Gift className="h-4 w-4" />
@@ -93,7 +95,9 @@ function Index() {
             </div>
           </div>
 
-          <RechargeCard />
+          <div id="recargar" className="scroll-mt-20">
+            <RechargeCard />
+          </div>
 
           <img
             src={heroPhone}
@@ -141,7 +145,7 @@ function Index() {
                   ))}
                 </ul>
                 <a
-                  href="#"
+                  href="#recargar"
                   className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand"
                 >
                   Recargar <ArrowRight className="h-4 w-4" />
@@ -152,8 +156,10 @@ function Index() {
         </div>
       </section>
 
+      <WeeklyOffers />
+
       {/* Beneficios */}
-      <section className="bg-surface-tint">
+      <section className="bg-surface">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
           {BENEFITS.map(({ icon: Icon, title, text }) => (
             <div key={title} className="text-center">
@@ -167,8 +173,10 @@ function Index() {
         </div>
       </section>
 
+      <HowItWorks />
+
       {/* Bloque final */}
-      <section className="bg-surface">
+      <section id="contacto" className="scroll-mt-20 bg-surface">
         <div className="mx-auto grid max-w-7xl gap-6 px-5 py-14 lg:grid-cols-[1.4fr_1fr] lg:px-8">
           <div className="grid items-center gap-6 rounded-2xl bg-navy p-6 sm:grid-cols-2">
             <img

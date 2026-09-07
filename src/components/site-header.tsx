@@ -1,6 +1,12 @@
 import { Smartphone } from "lucide-react";
 
-const NAV = ["Inicio", "Recargas", "Planes", "Cómo funciona", "Contacto"];
+const NAV = [
+  { label: "Inicio", href: "#inicio" },
+  { label: "Recargas", href: "#recargar" },
+  { label: "Ofertas semanales", href: "#ofertas" },
+  { label: "Cómo funciona", href: "#como-funciona" },
+  { label: "Contacto", href: "#contacto" },
+];
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
@@ -21,15 +27,15 @@ export function SiteHeader() {
         <nav className="order-3 -mx-1 flex w-full items-center gap-1 overflow-x-auto text-sm lg:order-2 lg:mx-6 lg:w-auto lg:flex-1">
           {NAV.map((item, i) => (
             <a
-              key={item}
-              href="#"
+              key={item.label}
+              href={item.href}
               className={`whitespace-nowrap rounded-md px-3 py-2 transition-colors ${
                 i === 0
                   ? "bg-white/10 font-semibold text-navy-foreground"
                   : "text-navy-foreground/70 hover:text-navy-foreground"
               }`}
             >
-              {item}
+              {item.label}
             </a>
           ))}
         </nav>
@@ -56,8 +62,8 @@ export function SiteFooter() {
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-navy-foreground/75">
           {NAV.map((item) => (
-            <a key={item} href="#" className="hover:text-navy-foreground">
-              {item}
+            <a key={item.label} href={item.href} className="hover:text-navy-foreground">
+              {item.label}
             </a>
           ))}
         </nav>
