@@ -4,8 +4,8 @@ import { CalendarClock, Flame, Sparkles } from "lucide-react";
 import { formatMoney, OPERATORS } from "@/components/recharge-card";
 
 export function WeeklyOffers() {
-  const [active, setActive] = useState(OPERATORS[0].name);
-  const operator = OPERATORS.find((op) => op.name === active) ?? OPERATORS[0];
+  const [active, setActive] = useState(OPERATORS[0]!.name);
+  const operator = OPERATORS.find((op) => op.name === active) ?? OPERATORS[0]!;
 
   return (
     <section id="ofertas" className="scroll-mt-20 bg-surface-tint">
