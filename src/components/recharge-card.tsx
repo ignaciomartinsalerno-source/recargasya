@@ -10,6 +10,19 @@ export const OPERATORS = [
 
 const AMOUNTS = ["$500", "$1.000", "$2.000", "$5.000", "$10.000"];
 
+const PAYMENT_METHODS = [
+  { id: "credit", label: "Tarjeta de crédito", icon: CreditCard },
+  { id: "debit", label: "Tarjeta de débito", icon: CreditCard },
+];
+
+function parseAmount(value: string): number {
+  return Number(value.replace(/\D/g, ""));
+}
+
+function formatMoney(value: number): string {
+  return "$" + value.toLocaleString("es-AR");
+}
+
 export function RechargeCard() {
   const [operator, setOperator] = useState("Movistar");
   const [amount, setAmount] = useState("$1.000");
