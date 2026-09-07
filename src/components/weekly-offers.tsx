@@ -8,7 +8,7 @@ export function WeeklyOffers() {
   const operator = OPERATORS.find((op) => op.name === active) ?? OPERATORS[0];
 
   return (
-    <section id="ofertas" className="scroll-mt-20 bg-surface">
+    <section id="ofertas" className="scroll-mt-20 bg-surface-tint">
       <div className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -68,7 +68,7 @@ export function WeeklyOffers() {
                 <p className="text-2xl font-extrabold text-card-foreground">
                   {formatMoney(offer.load)}
                 </p>
-                <div className="mt-4 rounded-xl bg-surface-tint px-4 py-3">
+                <div className="mt-4 rounded-xl bg-surface px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Recibís
                   </p>
