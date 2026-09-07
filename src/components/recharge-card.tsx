@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, CreditCard, Flame, Gift, Loader2, Lock, Smartphone } from "lucide-react";
+import { ArrowRight, CheckCircle2, CreditCard, Flame, Gift, Loader2, Lock, Smartphone } from "lucide-react";
 
 import movistarLogo from "@/assets/logos/movistar.svg";
 import claroLogo from "@/assets/logos/claro.svg";
