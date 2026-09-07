@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { ArrowRight, CreditCard, Gift, Smartphone } from "lucide-react";
 
+import movistarLogo from "@/assets/logos/movistar.svg";
+import claroLogo from "@/assets/logos/claro.svg";
+import personalLogo from "@/assets/logos/personal.svg";
+import tuentiLogo from "@/assets/logos/tuenti.svg";
+
 export const OPERATORS = [
-  { name: "Movistar", initials: "M", tone: "bg-brand text-brand-foreground" },
-  { name: "Claro", initials: "C", tone: "bg-destructive text-destructive-foreground" },
-  { name: "Personal", initials: "P", tone: "bg-sky text-navy-deep" },
-  { name: "Tuenti", initials: "T", tone: "bg-navy text-navy-foreground" },
+  { name: "Movistar", logo: movistarLogo },
+  { name: "Claro", logo: claroLogo },
+  { name: "Personal", logo: personalLogo },
+  { name: "Tuenti", logo: tuentiLogo },
 ];
 
 const AMOUNTS = ["$500", "$1.000", "$2.000", "$5.000", "$10.000"];
@@ -48,10 +53,8 @@ export function RechargeCard() {
                 : "border-border hover:border-brand/40"
             }`}
           >
-            <span
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${op.tone}`}
-            >
-              {op.initials}
+            <span className="flex h-8 w-full items-center justify-center">
+              <img src={op.logo} alt={`Logo de ${op.name}`} className="max-h-6 max-w-full object-contain" />
             </span>
             <span className="text-[11px] font-medium text-muted-foreground">{op.name}</span>
           </button>
