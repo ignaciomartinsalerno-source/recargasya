@@ -93,7 +93,9 @@ function Index() {
             </div>
           </div>
 
-          <RechargeCard />
+          <div id="recargar" className="scroll-mt-20">
+            <RechargeCard />
+          </div>
 
           <img
             src={heroPhone}
