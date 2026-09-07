@@ -114,13 +114,12 @@ function Index() {
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {OPERATORS.map((op) => (
               <div key={op.name} className="rounded-2xl border border-border bg-card p-6">
-                <div className="flex items-center gap-4">
-                  <span
-                    className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold ${op.tone}`}
-                  >
-                    {op.initials}
-                  </span>
-                  <span className="text-lg font-bold text-card-foreground">{op.name}</span>
+                <div className="flex h-14 items-center gap-4">
+                  <img
+                    src={op.logo}
+                    alt={`Logo oficial de ${op.name}`}
+                    className="max-h-10 max-w-[140px] object-contain"
+                  />
                 </div>
                 <p className="mt-5 text-sm text-muted-foreground">Saldo, datos y packs</p>
                 <a
