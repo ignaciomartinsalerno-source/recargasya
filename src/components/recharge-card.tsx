@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { ArrowRight, CreditCard, Flame, Gift, Smartphone } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CreditCard,
+  Flame,
+  Gift,
+  Lock,
+  ShieldCheck,
+  Smartphone,
+} from "lucide-react";
 
 import movistarLogo from "@/assets/logos/movistar.svg";
 import claroLogo from "@/assets/logos/claro.svg";
@@ -62,17 +71,160 @@ export function formatMoney(value: number): string {
   return "$" + value.toLocaleString("es-AR");
 }
 
+function formatCardNumber(value: string): string {
+  return value
+    .replace(/\D/g, "")
+    .slice(0, 16)
+    .replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+
+function formatExpiry(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
 export function RechargeCard() {
   const [operator, setOperator] = useState("Movistar");
   const [amount, setAmount] = useState(1000);
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"credit" | "debit" | null>(null);
-  const [notice, setNotice] = useState(false);
+  const [step, setStep] = useState<"form" | "checkout">("form");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [holder, setHolder] = useState("");
+  const [docId, setDocId] = useState("");
+  const [paid, setPaid] = useState(false);
 
   const current = OPERATORS.find((op) => op.name === operator) ?? OPERATORS[0]!;
   const activeOffer = current.offers.find((offer) => offer.load === amount);
   const bonus = (activeOffer ? activeOffer.receive - activeOffer.load : 0) + 5000;
   const totalCredit = formatMoney(amount + bonus);
+
+  const checkoutReady =
+    cardNumber.replace(/\s/g, "").length >= 15 &&
+    expiry.length === 5 &&
+    cvv.length >= 3 &&
+    holder.trim().length > 2;
+
+  if (step === "checkout") {
+    return (
+      <div className="rounded-2xl bg-card p-6 shadow-2xl">
+        <button
+          onClick={() => {
+            setStep("form");
+            setPaid(false);
+          }}
+          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-card-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Volver
+        </button>
+
+        <h2 className="mt-3 text-xl font-bold text-card-foreground">Datos de tu tarjeta</h2>
+        <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Lock className="h-3.5 w-3.5" /> Conexión segura · Simulación, no se procesan pagos reales
+        </p>
+
+        <div className="mt-4 rounded-xl border border-border bg-surface-tint p-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-2 text-card-foreground">
+              <img src={current.logo} alt={`Logo de ${current.name}`} className="max-h-4 max-w-14 object-contain" />
+              Recarga {current.name}
+            </span>
+            <span className="font-bold text-card-foreground">{formatMoney(amount)}</span>
+          </div>
+          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>{phone || "Sin número"}</span>
+            <span className="font-semibold text-success">Recibís {totalCredit}</span>
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          <div>
+            <label className="text-xs font-semibold text-card-foreground">Número de tarjeta</label>
+            <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-border px-3 py-3">
+              <CreditCard className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <input
+                value={cardNumber}
+                onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                inputMode="numeric"
+                autoComplete="cc-number"
+                placeholder="1234 5678 9012 3456"
+                className="w-full bg-transparent text-sm tracking-wider text-card-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-card-foreground">Vencimiento</label>
+              <input
+                value={expiry}
+                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                inputMode="numeric"
+                autoComplete="cc-exp"
+                placeholder="MM/AA"
+                className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-card-foreground">CVV</label>
+              <input
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                inputMode="numeric"
+                type="password"
+                autoComplete="cc-csc"
+                placeholder="123"
+                className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-card-foreground">Nombre del titular</label>
+            <input
+              value={holder}
+              onChange={(e) => setHolder(e.target.value)}
+              autoComplete="cc-name"
+              placeholder="Como figura en la tarjeta"
+              className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-card-foreground">DNI / CUIT del titular</label>
+            <input
+              value={docId}
+              onChange={(e) => setDocId(e.target.value.replace(/[^\d-]/g, "").slice(0, 13))}
+              inputMode="numeric"
+              placeholder="Ej: 30123456"
+              className="mt-1.5 w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={() => setPaid(true)}
+          disabled={!checkoutReady}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-bold text-brand-foreground transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Lock className="h-4 w-4" /> Pagar {formatMoney(amount)}
+        </button>
+
+        {paid ? (
+          <p className="mt-3 rounded-lg bg-success/10 px-3 py-2 text-center text-xs font-semibold text-success">
+            ¡Pago simulado aprobado! Tu recarga de {totalCredit} está en camino.
+          </p>
+        ) : (
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5" /> Simulación: no ingreses datos reales de tu tarjeta.
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl bg-card p-6 shadow-2xl">
@@ -211,16 +363,12 @@ export function RechargeCard() {
       )}
 
       <button
-        onClick={() => setNotice(true)}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-bold text-brand-foreground transition-colors hover:bg-brand/90"
+        onClick={() => paymentMethod && setStep("checkout")}
+        disabled={!paymentMethod}
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-bold text-brand-foreground transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Recargar ahora <ArrowRight className="h-4 w-4" />
+        Continuar al pago <ArrowRight className="h-4 w-4" />
       </button>
-      {notice && (
-        <p className="mt-3 rounded-lg bg-success/10 px-3 py-2 text-center text-xs font-semibold text-success">
-          ¡Recarga enviada! En breve recibirás el crédito en tu línea.
-        </p>
-      )}
     </div>
   );
 }
