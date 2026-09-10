@@ -29,23 +29,28 @@ export function WeeklyOffers() {
           </p>
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="mt-8 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           {OPERATORS.map((op) => (
             <button
               key={op.name}
               onClick={() => setActive(op.name)}
-              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
+              aria-label={`Ver ofertas de ${op.name}`}
+              aria-pressed={op.name === active}
+              className={`flex h-12 items-center justify-center rounded-xl border px-4 transition-colors sm:w-32 ${
                 op.name === active
-                  ? "border-brand bg-brand/10 text-brand"
-                  : "border-border bg-card text-muted-foreground hover:border-brand/40"
+                  ? "border-brand bg-brand/10"
+                  : "border-border bg-card hover:border-brand/40"
               }`}
             >
-              <img
-                src={op.logo}
-                alt={`Logo oficial de ${op.name}`}
-                className="max-h-5 max-w-[70px] object-contain"
-              />
-              {op.name}
+              <span className="flex h-7 w-24 items-center justify-center">
+                <img
+                  src={op.logo}
+                  alt={op.name}
+                  className={`object-contain ${
+                    op.name === "Claro" ? "h-7 w-7" : "max-h-6 max-w-24"
+                  }`}
+                />
+              </span>
             </button>
           ))}
         </div>
