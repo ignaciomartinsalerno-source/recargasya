@@ -36,6 +36,35 @@ const PAYMENT_METHODS: { id: PaymentMethodId; label: string; icon: typeof Credit
   { id: "debit", label: "Tarjeta de débito", icon: CreditCard },
 ];
 
+type CardBrand = "visa" | "mastercard" | null;
+
+function detectBrand(digits: string): CardBrand {
+  if (/^4/.test(digits)) return "visa";
+  if (/^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/.test(digits)) return "mastercard";
+  return null;
+}
+
+function CardBrandBadge({ brand }: { brand: CardBrand }) {
+  if (brand === "visa") {
+    return (
+      <span className="flex h-6 items-center rounded bg-[#1A1F71] px-2 text-[11px] font-black italic tracking-wider text-white">
+        VISA
+      </span>
+    );
+  }
+  if (brand === "mastercard") {
+    return (
+      <span className="flex h-6 items-center" aria-label="Mastercard">
+        <svg viewBox="0 0 36 22" className="h-5 w-8">
+          <circle cx="13" cy="11" r="9" fill="#EB001B" />
+          <circle cx="23" cy="11" r="9" fill="#F79E1B" fillOpacity="0.9" />
+        </svg>
+      </span>
+    );
+  }
+  return null;
+}
+
 export function RechargeCard() {
   const [operator, setOperator] = useState("Movistar");
   const [amount, setAmount] = useState(1000);
