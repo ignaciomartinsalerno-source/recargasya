@@ -229,13 +229,16 @@ export function RechargeCard() {
         <div className="mt-5 rounded-xl border border-border p-4">
           <p className="text-sm font-semibold text-card-foreground">Datos de tu tarjeta</p>
           <div className="mt-3 space-y-3">
-            <input
-              value={cardNumber}
-              onChange={(e) => setCardNumber(formatCard(e.target.value))}
-              inputMode="numeric"
-              placeholder="Número de tarjeta"
-              className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
-            />
+            <div className="flex items-center gap-2 rounded-xl border border-border px-3 py-3 focus-within:border-brand">
+              <input
+                value={cardNumber}
+                onChange={(e) => setCardNumber(formatCard(e.target.value))}
+                inputMode="numeric"
+                placeholder="Número de tarjeta"
+                className="w-full bg-transparent text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
+              />
+              <CardBrandBadge brand={detectBrand(cardDigits)} />
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <input
                 value={expiry}
