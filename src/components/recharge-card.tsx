@@ -264,8 +264,9 @@ export function RechargeCard() {
             />
             <input
               value={docId}
-              onChange={(e) => setDocId(e.target.value.slice(0, 15))}
+              onChange={(e) => setDocId(e.target.value.replace(/\D/g, "").slice(0, 11))}
               inputMode="numeric"
+              maxLength={11}
               placeholder="DNI / CUIT (opcional)"
               className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
             />
