@@ -1,8 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { AMOUNTS, OPERATOR_NAMES, PAYMENT_METHOD_IDS, quote } from "./catalog";
+
+function db() {
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+  return createClient(process.env["SUPABASE_URL"]!, key, {
+    auth: { persistSession: false },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) {
+          h.delete("Authorization");
+        }
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+}
 
 const checkoutInput = z.object({
   operator: z.string().refine((v) => OPERATOR_NAMES.includes(v), "Operador inválido"),
@@ -74,6 +92,20 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       "metadata[tipo_tarjeta]": data.paymentMethod,
     });
 
+    const sessionId = session["id"] as string;
+    const { error } = await db()
+      .from("recharge_orders")
+      .insert({
+        operator: priced.operator,
+        phone: data.phone,
+        amount_charged: priced.charge,
+        credit_amount: priced.credit,
+        payment_method: data.paymentMethod,
+        stripe_session_id: sessionId,
+        status: "pendiente",
+      });
+    if (error) console.error("No se pudo guardar el pedido", error.message);
+
     return { url: session["url"] as string };
   });
 
@@ -82,8 +114,19 @@ export const getCheckoutResult = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const session = await stripeRequest(`checkout/sessions/${encodeURIComponent(data.sessionId)}`);
     const metadata = (session["metadata"] ?? {}) as Record<string, string>;
+    const paid = session["payment_status"] === "paid";
+
+    if (paid) {
+      const { error } = await db()
+        .from("recharge_orders")
+        .update({ status: "pagado" })
+        .eq("stripe_session_id", data.sessionId)
+        .eq("status", "pendiente");
+      if (error) console.error("No se pudo actualizar el pedido", error.message);
+    }
+
     return {
-      paid: session["payment_status"] === "paid",
+      paid,
       operator: metadata["operador"] ?? "",
       phone: metadata["linea"] ?? "",
       credit: Number(metadata["credito_a_acreditar"] ?? 0),
