@@ -240,7 +240,15 @@ export function RechargeCard() {
         </p>
       )}
 
-      <p className="mt-5 text-sm font-semibold text-card-foreground">4. Elegí cómo pagar</p>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-card-foreground">4. Elegí cómo pagar</p>
+        <div className="flex items-center gap-1.5" aria-label="Tarjetas aceptadas">
+          <VisaBadge label="Crédito" />
+          <VisaBadge label="Débito" />
+          <MastercardBadge />
+          <AmexBadge />
+        </div>
+      </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         {PAYMENT_METHODS.map((method) => (
           <button
