@@ -88,8 +88,7 @@ export function RechargeCard() {
   const cardDigits = cardNumber.replace(/\D/g, "");
   const canPay =
     Boolean(paymentMethod) &&
-    digits.length >= 8 &&
-    digits.length <= 13 &&
+    digits.length === 8 &&
     cardDigits.length >= 15 &&
     /^\d{2}\/\d{2}$/.test(expiry) &&
     cvv.length >= 3 &&
@@ -168,9 +167,10 @@ export function RechargeCard() {
         <Smartphone className="h-4 w-4 text-muted-foreground" />
         <input
           value={phone}
-          onChange={(e) => setPhone(e.target.value.slice(0, 20))}
-          inputMode="tel"
-          placeholder="Ej: 11 1234 5678"
+          onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 8))}
+          inputMode="numeric"
+          maxLength={8}
+          placeholder="Ej: 11221045"
           className="w-full bg-transparent text-sm text-card-foreground outline-none placeholder:text-muted-foreground"
         />
       </div>
