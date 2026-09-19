@@ -240,13 +240,13 @@ function AdminPage() {
                 <tbody>
                   {ordersQuery.isLoading ? (
                     <tr>
-                      <td colSpan={7} className="px-5 py-10 text-center text-slate-500">
+                      <td colSpan={8} className="px-5 py-10 text-center text-slate-500">
                         Cargando pedidos...
                       </td>
                     </tr>
                   ) : filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-5 py-10 text-center text-slate-500">
+                      <td colSpan={8} className="px-5 py-10 text-center text-slate-500">
                         No hay pedidos todavía.
                       </td>
                     </tr>
