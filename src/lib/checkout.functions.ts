@@ -92,6 +92,29 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     return { url: session["url"] as string };
   });
 
+export const saveOrder = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => checkoutInput.parse(data))
+  .handler(async ({ data }) => {
+    const priced = quote(data.operator, data.amount);
+    if (!priced) throw new Error("La recarga seleccionada no está disponible.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("recharge_orders")
+      .insert({
+        operator: priced.operator,
+        phone: data.phone,
+        amount_charged: priced.charge,
+        credit_amount: priced.credit,
+        payment_method: data.paymentMethod,
+        status: "pagado",
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error("No se pudo guardar el pedido.");
+    return { orderId: row.id as string };
+  });
+
 export const getCheckoutResult = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => z.object({ sessionId: z.string().min(10).max(200) }).parse(data))
   .handler(async ({ data }) => {
