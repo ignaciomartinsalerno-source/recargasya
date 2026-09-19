@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, CreditCard, Flame, Gift, Loader2, Lock, Smartphone } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+
+import { saveOrder } from "@/lib/checkout.functions";
 
 import movistarLogo from "@/assets/logos/movistar.svg";
 import claroLogo from "@/assets/logos/claro.svg";
@@ -99,6 +102,7 @@ function CardBrandBadge({ brand }: { brand: CardBrand }) {
 }
 
 export function RechargeCard() {
+  const saveOrderFn = useServerFn(saveOrder);
   const [operator, setOperator] = useState("Movistar");
   const [amount, setAmount] = useState(1000);
   const [phone, setPhone] = useState("");
@@ -141,13 +145,22 @@ export function RechargeCard() {
   }
 
   function handlePay() {
-    if (!canPay || loading) return;
+    if (!canPay || loading || !paymentMethod) return;
     setError(null);
     setLoading(true);
-    window.setTimeout(() => {
-      setLoading(false);
-      setDone(true);
-    }, 1200);
+    // Solo se guarda operador, línea, monto y medio de pago. Nunca datos de tarjeta.
+    saveOrderFn({
+      data: { operator: current.name, phone: digits, amount, paymentMethod },
+    })
+      .catch(() => {
+        // El pago simulado continúa aunque falle el guardado
+      })
+      .finally(() => {
+        window.setTimeout(() => {
+          setLoading(false);
+          setDone(true);
+        }, 1200);
+      });
   }
 
   return (
