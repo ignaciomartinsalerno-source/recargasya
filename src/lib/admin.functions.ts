@@ -13,14 +13,23 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
 }
 
 export const listOrders = createServerFn({ method: "GET" })
+  .inputValidator((data: { search?: string } | undefined) => data ?? {})
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .handler(async ({ context, data: input }) => {
     await assertAdmin(context);
-    const { data, error } = await context.supabase
+    let query = context.supabase
       .from("recharge_orders")
       .select("id, operator, phone, amount_charged, credit_amount, payment_method, status, created_at")
       .order("created_at", { ascending: false })
       .limit(200);
+    const search = (input.search ?? "").trim();
+    if (search) {
+      const safe = search.replace(/[%,()]/g, "");
+      query = query.or(
+        `phone.ilike.%${safe}%,operator.ilike.%${safe}%,status.ilike.%${safe}%`,
+      );
+    }
+    const { data, error } = await query;
     if (error) throw new Error(error.message);
     return { orders: data ?? [] };
   });
