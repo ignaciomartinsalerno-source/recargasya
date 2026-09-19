@@ -227,6 +227,7 @@ function AdminPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+                    <th className="px-5 py-3 font-medium">ID</th>
                     <th className="px-5 py-3 font-medium">Fecha</th>
                     <th className="px-5 py-3 font-medium">Operador</th>
                     <th className="px-5 py-3 font-medium">Línea</th>
