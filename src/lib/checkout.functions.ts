@@ -1,8 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { AMOUNTS, OPERATOR_NAMES, PAYMENT_METHOD_IDS, quote } from "./catalog";
+
+function db() {
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+  return createClient(process.env["SUPABASE_URL"]!, key, {
+    auth: { persistSession: false },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) {
+          h.delete("Authorization");
+        }
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+}
 
 const checkoutInput = z.object({
   operator: z.string().refine((v) => OPERATOR_NAMES.includes(v), "Operador inválido"),
