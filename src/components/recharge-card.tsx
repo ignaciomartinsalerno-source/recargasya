@@ -36,32 +36,65 @@ const PAYMENT_METHODS: { id: PaymentMethodId; label: string; icon: typeof Credit
   { id: "debit", label: "Tarjeta de débito", icon: CreditCard },
 ];
 
-type CardBrand = "visa" | "mastercard" | null;
+type CardBrand = "visa" | "mastercard" | "amex" | null;
 
 function detectBrand(digits: string): CardBrand {
+  if (/^3[47]/.test(digits)) return "amex";
   if (/^4/.test(digits)) return "visa";
   if (/^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/.test(digits)) return "mastercard";
   return null;
 }
 
-function CardBrandBadge({ brand }: { brand: CardBrand }) {
-  if (brand === "visa") {
-    return (
-      <span className="flex h-6 items-center rounded bg-[#1A1F71] px-2 text-[11px] font-black italic tracking-wider text-white">
+function VisaBadge({ label }: { label?: string }) {
+  return (
+    <span
+      className="flex h-7 min-w-[52px] items-center justify-center gap-1 rounded-md border border-border bg-white px-2 shadow-sm"
+      aria-label={label ? `Visa ${label}` : "Visa"}
+    >
+      <span className="text-[12px] font-black italic leading-none tracking-wide text-[#1A1F71]">
         VISA
       </span>
-    );
-  }
-  if (brand === "mastercard") {
-    return (
-      <span className="flex h-6 items-center" aria-label="Mastercard">
-        <svg viewBox="0 0 36 22" className="h-5 w-8">
-          <circle cx="13" cy="11" r="9" fill="#EB001B" />
-          <circle cx="23" cy="11" r="9" fill="#F79E1B" fillOpacity="0.9" />
-        </svg>
+      {label && (
+        <span className="text-[9px] font-bold uppercase leading-none text-[#1A1F71]/70">
+          {label}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function MastercardBadge() {
+  return (
+    <span
+      className="flex h-7 min-w-[52px] items-center justify-center gap-1 rounded-md border border-border bg-white px-2 shadow-sm"
+      aria-label="Mastercard"
+    >
+      <svg viewBox="0 0 36 22" className="h-4 w-7" aria-hidden="true">
+        <circle cx="13" cy="11" r="9" fill="#EB001B" />
+        <circle cx="23" cy="11" r="9" fill="#F79E1B" fillOpacity="0.85" />
+      </svg>
+      <span className="text-[8px] font-bold uppercase leading-none text-muted-foreground">
+        Master
       </span>
-    );
-  }
+    </span>
+  );
+}
+
+function AmexBadge() {
+  return (
+    <span
+      className="flex h-7 min-w-[52px] items-center justify-center rounded-md border border-border bg-[#2E77BC] px-2 shadow-sm"
+      aria-label="American Express"
+    >
+      <span className="text-[11px] font-black leading-none tracking-wide text-white">AMEX</span>
+    </span>
+  );
+}
+
+function CardBrandBadge({ brand }: { brand: CardBrand }) {
+  if (brand === "visa") return <VisaBadge />;
+  if (brand === "mastercard") return <MastercardBadge />;
+  if (brand === "amex") return <AmexBadge />;
   return null;
 }
 
