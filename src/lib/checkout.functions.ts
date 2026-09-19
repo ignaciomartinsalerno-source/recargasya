@@ -92,6 +92,20 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       "metadata[tipo_tarjeta]": data.paymentMethod,
     });
 
+    const sessionId = session["id"] as string;
+    const { error } = await db()
+      .from("recharge_orders")
+      .insert({
+        operator: priced.operator,
+        phone: data.phone,
+        amount_charged: priced.charge,
+        credit_amount: priced.credit,
+        payment_method: data.paymentMethod,
+        stripe_session_id: sessionId,
+        status: "pendiente",
+      });
+    if (error) console.error("No se pudo guardar el pedido", error.message);
+
     return { url: session["url"] as string };
   });
 
@@ -100,8 +114,19 @@ export const getCheckoutResult = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const session = await stripeRequest(`checkout/sessions/${encodeURIComponent(data.sessionId)}`);
     const metadata = (session["metadata"] ?? {}) as Record<string, string>;
+    const paid = session["payment_status"] === "paid";
+
+    if (paid) {
+      const { error } = await db()
+        .from("recharge_orders")
+        .update({ status: "pagado" })
+        .eq("stripe_session_id", data.sessionId)
+        .eq("status", "pendiente");
+      if (error) console.error("No se pudo actualizar el pedido", error.message);
+    }
+
     return {
-      paid: session["payment_status"] === "paid",
+      paid,
       operator: metadata["operador"] ?? "",
       phone: metadata["linea"] ?? "",
       credit: Number(metadata["credito_a_acreditar"] ?? 0),
