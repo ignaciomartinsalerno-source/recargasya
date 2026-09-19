@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Home,
   Users,
@@ -65,26 +65,22 @@ function AdminPage() {
     queryFn: () => checkIsAdminFn(),
   });
 
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [active, setActive] = useState("Inicio");
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 350);
+    return () => clearTimeout(t);
+  }, [search]);
+
   const ordersQuery = useQuery({
-    queryKey: ["orders"],
-    queryFn: () => listOrdersFn(),
+    queryKey: ["orders", debouncedSearch],
+    queryFn: () => listOrdersFn({ data: { search: debouncedSearch } }),
     enabled: roleQuery.data?.isAdmin === true,
   });
 
-  const [search, setSearch] = useState("");
-  const [active, setActive] = useState("Inicio");
-
-  const filtered = useMemo(() => {
-    const orders: Order[] = ordersQuery.data?.orders ?? [];
-    if (!search.trim()) return orders;
-    const q = search.trim().toLowerCase();
-    return orders.filter(
-      (o) =>
-        o.phone.toLowerCase().includes(q) ||
-        o.operator.toLowerCase().includes(q) ||
-        o.status.toLowerCase().includes(q),
-    );
-  }, [ordersQuery.data, search]);
+  const filtered: Order[] = ordersQuery.data?.orders ?? [];
 
   async function handleSignOut() {
     await supabase.auth.signOut();
