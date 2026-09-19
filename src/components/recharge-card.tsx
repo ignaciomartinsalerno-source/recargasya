@@ -280,7 +280,39 @@ export function RechargeCard() {
       </div>
 
       {paymentMethod && (
-        <div className="mt-5 rounded-xl border border-border p-4">
+        <div className="mt-5">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-5 text-slate-100 shadow-xl ring-1 ring-white/10">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
+                === Tarjeta Demo ===
+              </span>
+              <CreditCard className="h-5 w-5 text-slate-400" />
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[13px]">
+              <p className="text-slate-400">Nombre</p>
+              <p className="text-right font-semibold">USUARIO DEMO</p>
+              <p className="text-slate-400">DNI</p>
+              <p className="text-right font-semibold">00.000.000</p>
+              <p className="text-slate-400">Tipo</p>
+              <p className="text-right font-semibold">CRÉDITO</p>
+              <p className="text-slate-400">Número</p>
+              <p className="text-right font-mono font-semibold">XXXX XXXX XXXX XXXX</p>
+              <p className="text-slate-400">Vencimiento</p>
+              <p className="text-right font-mono font-semibold">XX/XX</p>
+              <p className="text-slate-400">CVV</p>
+              <p className="text-right font-mono font-semibold">XXX</p>
+            </div>
+            <div className="mt-4 rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-center">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
+                === Solo demostración ===
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-300">
+                Datos ficticios — no corresponden a una tarjeta real.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-border p-4">
           <p className="text-sm font-semibold text-card-foreground">Datos de tu tarjeta</p>
           <div className="mt-3 space-y-3">
             <div className="flex items-center gap-2 rounded-xl border border-border px-3 py-3 focus-within:border-brand">
@@ -324,6 +356,7 @@ export function RechargeCard() {
               placeholder="DNI / CUIT (opcional)"
               className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
             />
+          </div>
           </div>
         </div>
       )}
