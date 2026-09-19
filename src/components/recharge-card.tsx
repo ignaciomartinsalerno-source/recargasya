@@ -325,7 +325,6 @@ export function RechargeCard() {
               className="w-full rounded-xl border border-border px-3 py-3 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus:border-brand"
             />
           </div>
-          </div>
         </div>
       )}
 
