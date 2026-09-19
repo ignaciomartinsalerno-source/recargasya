@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      recharge_orders: {
+        Row: {
+          amount_charged: number
+          created_at: string
+          credit_amount: number
+          id: string
+          operator: string
+          payment_method: string
+          phone: string
+          status: string
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_charged: number
+          created_at?: string
+          credit_amount: number
+          id?: string
+          operator: string
+          payment_method: string
+          phone: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_charged?: number
+          created_at?: string
+          credit_amount?: number
+          id?: string
+          operator?: string
+          payment_method?: string
+          phone?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
