@@ -256,6 +256,9 @@ function AdminPage() {
                         key={o.id}
                         className="border-t border-slate-800/70 transition-colors hover:bg-slate-800/30"
                       >
+                        <td className="px-5 py-3.5 font-mono text-xs text-slate-500">
+                          {o.id.slice(0, 8)}
+                        </td>
                         <td className="px-5 py-3.5 text-slate-400">
                           {new Date(o.created_at).toLocaleString("es-AR")}
                         </td>
